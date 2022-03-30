@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="Update_dataFlow" doc:id="30cb476e-eb87-4e8c-87ec-809303faad19" >
+		<http:listener doc:name="Listener" doc:id="1a2f2e8a-695a-4438-87cc-f7e0b51fe7ae" config-ref="HTTP_Listener_config" path="/updatedatabase" allowedMethods="PUT"/>
+		<db:update doc:name="Update" doc:id="47480816-ccae-46c8-baf3-a59c0cfbad11" config-ref="Database_Config">
+			<db:sql ><![CDATA[update Persons set PersonID =:PersonID1 where City =:City1]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	City1:payload.Person.City,
+	PersonID1:payload.Person.PerID
+}]]]></db:input-parameters>
+		</db:update>
+		<ee:transform doc:name="Transform Message" doc:id="271a0e76-8563-4135-8c37-532ae5d14f8a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	response:
+	{
+		Status:200,
+	    message:"Success"
+	}
+	    
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
